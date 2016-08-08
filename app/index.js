@@ -1,22 +1,9 @@
 import 'babel-polyfill'
-import thunkMiddleware from 'redux-thunk'
-import createLogger from 'redux-logger'
-import { createStore, applyMiddleware } from 'redux'
-import { fetchPuppies, fetchBreeds } from './actions'
-import rootReducer from './reducers'
+import React from 'react'
+import { render } from 'react-dom'
+import Root from './containers/Root'
 
-const loggerMiddleware = createLogger()
-
-const store = createStore(
-  rootReducer,
-  applyMiddleware(
-    thunkMiddleware,
-    loggerMiddleware
-  )
+render (
+  <Root />,
+  document.getElementById('app')
 )
-
-store.dispatch(fetchPuppies())
-  .then( () => console.log(store.getState()))
-
-store.dispatch(fetchBreeds())
-  .then( () => console.log(store.getState()))
