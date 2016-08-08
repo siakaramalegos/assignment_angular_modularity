@@ -33553,7 +33553,56 @@
   \*************************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+	
+	var _react = __webpack_require__(/*! react */ 298);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	var _Puppy = __webpack_require__(/*! ./Puppy */ 505);
+	
+	var _Puppy2 = _interopRequireDefault(_Puppy);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var PuppyList = function PuppyList(_ref) {
+	  var puppies = _ref.puppies;
+	  return _react2.default.createElement(
+	    'div',
+	    { id: 'puppy-list' },
+	    _react2.default.createElement(
+	      'h2',
+	      null,
+	      'Our Puppies'
+	    ),
+	    _react2.default.createElement(
+	      'ul',
+	      null,
+	      puppies.map(function (puppy) {
+	        return _react2.default.createElement(_Puppy2.default, _extends({
+	          key: puppy.id
+	        }, puppy));
+	      })
+	    )
+	  );
+	};
+	
+	exports.default = PuppyList;
+
+/***/ },
+/* 505 */
+/*!*********************************!*\
+  !*** ./app/components/Puppy.js ***!
+  \*********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
@@ -33565,31 +33614,31 @@
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var PuppyList = function PuppyList(_ref) {
-	  var puppies = _ref.puppies;
+	var Puppy = function Puppy(_ref) {
+	  var name = _ref.name;
+	  var breed = _ref.breed;
+	  var created_at = _ref.created_at;
+	
+	  var createdAt = new Date(created_at);
+	
 	  return _react2.default.createElement(
-	    "div",
-	    { id: "puppy-list" },
+	    'li',
+	    null,
 	    _react2.default.createElement(
-	      "h2",
+	      'strong',
 	      null,
-	      "Our Puppies"
+	      name
 	    ),
-	    _react2.default.createElement(
-	      "ul",
-	      null,
-	      puppies.map(function (puppy) {
-	        return _react2.default.createElement(
-	          "li",
-	          { key: puppy.id },
-	          puppy.name
-	        );
-	      })
-	    )
+	    ' (',
+	    breed.name,
+	    '), checked in on ',
+	    createdAt.toLocaleDateString(),
+	    ' at ',
+	    createdAt.toLocaleTimeString()
 	  );
 	};
 	
-	exports.default = PuppyList;
+	exports.default = Puppy;
 
 /***/ }
 /******/ ]);
