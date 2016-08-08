@@ -32,7 +32,7 @@ export function receiveBreeds(json) {
   }
 }
 
-// Thunk action creator
+// Thunk action creators
 export function fetchPuppies() {
   return function (dispatch) {
     // First, inform app API call is starting
@@ -42,5 +42,14 @@ export function fetchPuppies() {
     return fetch('https://ajax-puppies.herokuapp.com/puppies.json')
       .then(response => response.json())
       .then(json => dispatch(receivePuppies(json)))
+  }
+}
+
+export function fetchBreeds() {
+  return function (dispatch) {
+    dispatch(requestBreeds())
+    return fetch('https://ajax-puppies.herokuapp.com/breeds.json')
+      .then(response => response.json())
+      .then(json => dispatch(receiveBreeds(json)))
   }
 }

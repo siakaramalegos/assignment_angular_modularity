@@ -24,8 +24,29 @@ function puppies (state = {
   }
 }
 
+function breeds (state = {
+  isFetching: false,
+  items: []
+}, action) {
+  switch (action.type) {
+    case REQUEST_BREEDS:
+      return Object.assign({}, state, {
+        isFetching: true
+      })
+    case RECEIVE_BREEDS:
+      return Object.assign({}, state, {
+        isFetching: false,
+        items: action.breeds,
+        lastUpdated: action.receivedAt
+      })
+    default:
+      return state
+  }
+}
+
 const rootReducer = combineReducers({
-  puppies
+  puppies,
+  breeds
 })
 
 export default rootReducer

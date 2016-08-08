@@ -76,6 +76,10 @@
 	store.dispatch((0, _actions.fetchPuppies)()).then(function () {
 	  return console.log(store.getState());
 	});
+	
+	store.dispatch((0, _actions.fetchBreeds)()).then(function () {
+	  return console.log(store.getState());
+	});
 
 /***/ },
 /* 1 */
@@ -10265,6 +10269,7 @@
 	exports.requestBreeds = requestBreeds;
 	exports.receiveBreeds = receiveBreeds;
 	exports.fetchPuppies = fetchPuppies;
+	exports.fetchBreeds = fetchBreeds;
 	
 	var _isomorphicFetch = __webpack_require__(/*! isomorphic-fetch */ 315);
 	
@@ -10304,7 +10309,7 @@
 	  };
 	}
 	
-	// Thunk action creator
+	// Thunk action creators
 	function fetchPuppies() {
 	  return function (dispatch) {
 	    // First, inform app API call is starting
@@ -10315,6 +10320,17 @@
 	      return response.json();
 	    }).then(function (json) {
 	      return dispatch(receivePuppies(json));
+	    });
+	  };
+	}
+	
+	function fetchBreeds() {
+	  return function (dispatch) {
+	    dispatch(requestBreeds());
+	    return (0, _isomorphicFetch2.default)('https://ajax-puppies.herokuapp.com/breeds.json').then(function (response) {
+	      return response.json();
+	    }).then(function (json) {
+	      return dispatch(receiveBreeds(json));
 	    });
 	  };
 	}
@@ -10819,8 +10835,32 @@
 	  }
 	}
 	
+	function breeds() {
+	  var state = arguments.length <= 0 || arguments[0] === undefined ? {
+	    isFetching: false,
+	    items: []
+	  } : arguments[0];
+	  var action = arguments[1];
+	
+	  switch (action.type) {
+	    case _actions.REQUEST_BREEDS:
+	      return Object.assign({}, state, {
+	        isFetching: true
+	      });
+	    case _actions.RECEIVE_BREEDS:
+	      return Object.assign({}, state, {
+	        isFetching: false,
+	        items: action.breeds,
+	        lastUpdated: action.receivedAt
+	      });
+	    default:
+	      return state;
+	  }
+	}
+	
 	var rootReducer = (0, _redux.combineReducers)({
-	  puppies: puppies
+	  puppies: puppies,
+	  breeds: breeds
 	});
 	
 	exports.default = rootReducer;
