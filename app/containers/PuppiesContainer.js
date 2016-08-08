@@ -1,29 +1,74 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { fetchPuppies } from '../actions'
+import { fetchPuppiesIfNeeded } from '../actions'
 import PuppyList from '../components/PuppyList'
 
 class PuppiesContainer extends React.Component {
 
   componentDidMount() {
     const { dispatch } = this.props
-    dispatch(fetchPuppies())
+    dispatch(fetchPuppiesIfNeeded())
+  }
+
+  handleRefreshClick = (e) => {
+    e.preventDefault()
+    const { dispatch } = this.props
+    dispatch(fetchPuppiesIfNeeded())
   }
 
   render() {
+    // TODO: refactor to simpler cases, add proptypes
     const { puppies, isFetching, lastUpdated } = this.props
     return (
       <div id="puppies-container">
-        <PuppyList puppies={puppies} />
+        <h2>Our Puppies</h2>
+        <p>
+          {
+            lastUpdated &&
+            <span>
+              Last updated at {new Date(lastUpdated).toLocaleTimeString()}
+            </span>
+          }
+          <br />
+          {
+            !isFetching &&
+            <a href="#" onClick={this.handleRefreshClick}>
+              Refresh
+            </a>
+          }
+        </p>
+        {
+          isFetching && puppies.length === 0 &&
+          <h4>Loading...</h4>
+        }
+        {
+          !isFetching && puppies.length === 0 &&
+          <h4>No posts!</h4>
+        }
+        {
+          puppies.length > 0 &&
+          <div style={{opacity: isFetching ? 0.5 : 1}}>
+            <PuppyList puppies={puppies} />
+          </div>
+        }
       </div>
     )
   }
 }
 
 const mapStateToProps = (state) => {
-  console.log(state.puppies.items)
+  const {
+    items: puppies,
+    isFetching,
+    lastUpdated
+  } = state.puppies || {
+    isFetching: true,
+    items: []
+  }
   return {
-    puppies: state.puppies.items
+    puppies,
+    isFetching,
+    lastUpdated
   }
 }
 

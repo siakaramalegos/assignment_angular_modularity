@@ -32899,7 +32899,7 @@
 	exports.receivePuppies = receivePuppies;
 	exports.requestBreeds = requestBreeds;
 	exports.receiveBreeds = receiveBreeds;
-	exports.fetchPuppies = fetchPuppies;
+	exports.fetchPuppiesIfNeeded = fetchPuppiesIfNeeded;
 	exports.fetchBreeds = fetchBreeds;
 	
 	var _isomorphicFetch = __webpack_require__(/*! isomorphic-fetch */ 500);
@@ -32940,6 +32940,17 @@
 	  };
 	}
 	
+	function shouldFetchPuppies(state) {
+	  var puppies = state.puppies;
+	  if (!puppies) {
+	    return true;
+	  } else if (puppies.isFetching) {
+	    return false;
+	  } else {
+	    return true;
+	  }
+	}
+	
 	// Thunk action creators
 	function fetchPuppies() {
 	  return function (dispatch) {
@@ -32952,6 +32963,17 @@
 	    }).then(function (json) {
 	      return dispatch(receivePuppies(json));
 	    });
+	  };
+	}
+	
+	function fetchPuppiesIfNeeded() {
+	  return function (dispatch, getState) {
+	    if (shouldFetchPuppies(getState())) {
+	      return dispatch(fetchPuppies());
+	    } else {
+	      // Let the calling code know there is nothing to resolve
+	      return Promise.resolve();
+	    }
 	  };
 	}
 	
@@ -33500,9 +33522,22 @@
 	  _inherits(PuppiesContainer, _React$Component);
 	
 	  function PuppiesContainer() {
+	    var _Object$getPrototypeO;
+	
+	    var _temp, _this, _ret;
+	
 	    _classCallCheck(this, PuppiesContainer);
 	
-	    return _possibleConstructorReturn(this, Object.getPrototypeOf(PuppiesContainer).apply(this, arguments));
+	    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+	      args[_key] = arguments[_key];
+	    }
+	
+	    return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_Object$getPrototypeO = Object.getPrototypeOf(PuppiesContainer)).call.apply(_Object$getPrototypeO, [this].concat(args))), _this), _this.handleRefreshClick = function (e) {
+	      e.preventDefault();
+	      var dispatch = _this.props.dispatch;
+	
+	      dispatch((0, _actions.fetchPuppiesIfNeeded)());
+	    }, _temp), _possibleConstructorReturn(_this, _ret);
 	  }
 	
 	  _createClass(PuppiesContainer, [{
@@ -33510,11 +33545,12 @@
 	    value: function componentDidMount() {
 	      var dispatch = this.props.dispatch;
 	
-	      dispatch((0, _actions.fetchPuppies)());
+	      dispatch((0, _actions.fetchPuppiesIfNeeded)());
 	    }
 	  }, {
 	    key: 'render',
 	    value: function render() {
+	      // TODO: refactor to simpler cases, add proptypes
 	      var _props = this.props;
 	      var puppies = _props.puppies;
 	      var isFetching = _props.isFetching;
@@ -33523,7 +33559,42 @@
 	      return _react2.default.createElement(
 	        'div',
 	        { id: 'puppies-container' },
-	        _react2.default.createElement(_PuppyList2.default, { puppies: puppies })
+	        _react2.default.createElement(
+	          'h2',
+	          null,
+	          'Our Puppies'
+	        ),
+	        _react2.default.createElement(
+	          'p',
+	          null,
+	          lastUpdated && _react2.default.createElement(
+	            'span',
+	            null,
+	            'Last updated at ',
+	            new Date(lastUpdated).toLocaleTimeString()
+	          ),
+	          _react2.default.createElement('br', null),
+	          !isFetching && _react2.default.createElement(
+	            'a',
+	            { href: '#', onClick: this.handleRefreshClick },
+	            'Refresh'
+	          )
+	        ),
+	        isFetching && puppies.length === 0 && _react2.default.createElement(
+	          'h4',
+	          null,
+	          'Loading...'
+	        ),
+	        !isFetching && puppies.length === 0 && _react2.default.createElement(
+	          'h4',
+	          null,
+	          'No posts!'
+	        ),
+	        puppies.length > 0 && _react2.default.createElement(
+	          'div',
+	          { style: { opacity: isFetching ? 0.5 : 1 } },
+	          _react2.default.createElement(_PuppyList2.default, { puppies: puppies })
+	        )
 	      );
 	    }
 	  }]);
@@ -33532,9 +33603,19 @@
 	}(_react2.default.Component);
 	
 	var mapStateToProps = function mapStateToProps(state) {
-	  console.log(state.puppies.items);
+	  var _ref = state.puppies || {
+	    isFetching: true,
+	    items: []
+	  };
+	
+	  var puppies = _ref.items;
+	  var isFetching = _ref.isFetching;
+	  var lastUpdated = _ref.lastUpdated;
+	
 	  return {
-	    puppies: state.puppies.items
+	    puppies: puppies,
+	    isFetching: isFetching,
+	    lastUpdated: lastUpdated
 	  };
 	};
 	
@@ -33576,11 +33657,6 @@
 	  return _react2.default.createElement(
 	    'div',
 	    { id: 'puppy-list' },
-	    _react2.default.createElement(
-	      'h2',
-	      null,
-	      'Our Puppies'
-	    ),
 	    _react2.default.createElement(
 	      'ul',
 	      null,

@@ -32,8 +32,19 @@ export function receiveBreeds(json) {
   }
 }
 
+function shouldFetchPuppies(state) {
+  const puppies = state.puppies
+  if (!puppies) {
+    return true
+  } else if (puppies.isFetching) {
+    return false
+  } else {
+    return true
+  }
+}
+
 // Thunk action creators
-export function fetchPuppies() {
+function fetchPuppies() {
   return function (dispatch) {
     // First, inform app API call is starting
     dispatch(requestPuppies())
@@ -42,6 +53,17 @@ export function fetchPuppies() {
     return fetch('https://ajax-puppies.herokuapp.com/puppies.json')
       .then(response => response.json())
       .then(json => dispatch(receivePuppies(json)))
+  }
+}
+
+export function fetchPuppiesIfNeeded() {
+  return (dispatch, getState) => {
+    if (shouldFetchPuppies(getState())) {
+      return dispatch(fetchPuppies())
+    } else {
+      // Let the calling code know there is nothing to resolve
+      return Promise.resolve()
+    }
   }
 }
 
